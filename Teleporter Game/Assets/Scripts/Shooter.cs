@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Shooter : MonoBehaviour
@@ -10,17 +8,11 @@ public class Shooter : MonoBehaviour
     public float fireRate = 1f;
     private float lastFired = 0f;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
         lastFired += Time.deltaTime;
-        if (Input.GetButtonDown("Fire1") && lastFired >= fireRate)
+        if (Input.GetButtonDown("Jump") && lastFired >= fireRate)
         {
             Shoot();
             lastFired = 0f;
