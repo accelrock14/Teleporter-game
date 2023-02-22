@@ -20,13 +20,12 @@ public class EnemyController : MonoBehaviour
     private float teleportInterval;
     private float timeSinceLastSpawn = 0f;
     private float minSpawnDistance = 2f;
-    private float minDistanceFromEdge = 0.05f;
     private float minX, maxX, minY, maxY;
 
     private GameObject player;
-    private Rigidbody2D rigidBody;
-    private Vector2 currentDirection;
+    private Rigidbody2D rb;
     private Camera mainCamera;
+    private GameManager gameState;
 
     public Transform firePoint;
     public GameObject bulletPrefab;
@@ -35,91 +34,46 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         player = GameObject.FindWithTag("Player");
-        rigidBody = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
-        Vector3 lowerLeft = mainCamera.ViewportToWorldPoint(new Vector3(padding, padding, 0f));
-        Vector3 upperRight = mainCamera.ViewportToWorldPoint(new Vector3(1f - padding, 1f - padding, 0f));
-        minX = lowerLeft.x;
-        maxX = upperRight.x;
-        minY = lowerLeft.y;
-        maxY = upperRight.y;
-        currentDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+        gameState = FindObjectOfType<GameManager>();
 
         teleportInterval = Random.Range(minTeleportInterval, maxTeleportInterval);
         fireRate = Random.Range(minFireInterval, maxFireInterval);
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        Vector2 newPosition = (Vector2)transform.position + currentDirection * moveSpeed * Time.deltaTime;
-        
-        Border();
-        float newX = Mathf.Clamp(newPosition.x, minX, maxX);
-        float newY = Mathf.Clamp(newPosition.y, minY, maxY);
-        transform.position = new Vector3(newX, newY, transform.position.z);
-
         // Rotate the enemy towards the player
-        if (player != null)
+        if (gameState.state != GameState.LOST)
         {
+            Vector3 lowerLeft = mainCamera.ViewportToWorldPoint(new Vector3(padding, padding, 0f));
+            Vector3 upperRight = mainCamera.ViewportToWorldPoint(new Vector3(1f - padding, 1f - padding, 0f));
+            minX = lowerLeft.x;
+            maxX = upperRight.x;
+            minY = lowerLeft.y;
+            maxY = upperRight.y;
+
+            Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+            directionToPlayer.Normalize();
+            rb.velocity = transform.up * moveSpeed * Time.deltaTime;
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Rotate(), rotateSpeed * Time.deltaTime);
-        }
 
-        timeSinceLastSpawn += Time.deltaTime;
+            timeSinceLastSpawn += Time.deltaTime;
 
-        if (timeSinceLastSpawn >= teleportInterval)
-        {
-            Teleport();
-            timeSinceLastSpawn = 0f;
-            teleportInterval = Random.Range(minTeleportInterval, maxTeleportInterval);
-        }
+            if (timeSinceLastSpawn >= teleportInterval)
+            {
+                Teleport();
+                timeSinceLastSpawn = 0f;
+                teleportInterval = Random.Range(minTeleportInterval, maxTeleportInterval);
+            }
 
-        lastFired += Time.deltaTime;
-        if (lastFired >= fireRate)
-        {
-            Shoot();
-        }
-    }
-    private void Border()
-    {
-        float distanceFromLeftEdge = transform.position.x - minX;
-        float distanceFromRightEdge = maxX - transform.position.x;
-        float distanceFromBottomEdge = transform.position.y - minY;
-        float distanceFromTopEdge = maxY - transform.position.y;
-
-        // Check if the enemy is too close to the edge of the screen
-        if (distanceFromLeftEdge < minDistanceFromEdge)
-        {
-            // Adjust the x direction to move away from the left edge
-            currentDirection.x = Mathf.Abs(currentDirection.x);
-        }
-        else if (distanceFromRightEdge < minDistanceFromEdge)
-        {
-            // Adjust the x direction to move away from the right edge
-            currentDirection.x = -Mathf.Abs(currentDirection.x);
-        }
-
-        if (distanceFromBottomEdge < minDistanceFromEdge)
-        {
-            // Adjust the y direction to move away from the bottom edge
-            currentDirection.y = Mathf.Abs(currentDirection.y);
-        }
-        else if (distanceFromTopEdge < minDistanceFromEdge)
-        {
-            // Adjust the y direction to move away from the top edge
-            currentDirection.y = -Mathf.Abs(currentDirection.y);
-        }
-
-        if (transform.position.x < minX || transform.position.x > maxX)
-        {
-            // Reverse the x direction
-            currentDirection.x *= -1;
-        }
-
-        if (transform.position.y < minY || transform.position.y > maxY)
-        {
-            // Reverse the y direction
-            currentDirection.y *= -1;
+            lastFired += Time.deltaTime;
+            if (lastFired >= fireRate)
+            {
+                Shoot();
+            }
         }
     }
     private Quaternion Rotate()
@@ -133,18 +87,15 @@ public class EnemyController : MonoBehaviour
     }
     private void Teleport()
     {
-        if(player != null)
+        Vector2 currentDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+        Vector2 destination = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
+        while (Vector2.Distance(destination, player.transform.position) < minSpawnDistance)
         {
-            currentDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
-            Vector2 destination = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
-            while (Vector2.Distance(destination, player.transform.position) < minSpawnDistance)
-            {
-                destination = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
-            }
-            transform.position = destination;
-
-            transform.rotation = Rotate();
+            destination = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
         }
+        transform.position = destination;
+
+        transform.rotation = Rotate();
     }
     private void Shoot()
     {

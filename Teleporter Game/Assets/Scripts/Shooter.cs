@@ -12,14 +12,13 @@ public class Shooter : MonoBehaviour
     void Update()
     {
         lastFired += Time.deltaTime;
-        if (Input.GetButtonDown("Jump") && lastFired >= fireRate)
+    }
+    public void Shoot()
+    {
+        if (lastFired >= fireRate)
         {
-            Shoot();
+            Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
             lastFired = 0f;
         }
-    }
-    void Shoot()
-    {
-        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }
 }
