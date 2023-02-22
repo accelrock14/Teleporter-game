@@ -7,6 +7,7 @@ public class EnemySpawn : MonoBehaviour
     public GameObject enemyPrefab;
     private GameObject player;
     private Camera mainCamera;
+    private GameManager gameState;
 
     public float minSpawnIntervel;
     public float maxSpawnIntervel;
@@ -23,12 +24,7 @@ public class EnemySpawn : MonoBehaviour
         player = GameObject.FindWithTag("Player");
         spawnIntervel = Random.Range(minSpawnIntervel, maxSpawnIntervel);
         mainCamera = Camera.main;
-        Vector3 lowerLeft = mainCamera.ViewportToWorldPoint(new Vector3(padding, padding, 0f));
-        Vector3 upperRight = mainCamera.ViewportToWorldPoint(new Vector3(1f - padding, 1f - padding, 0f));
-        minX = lowerLeft.x;
-        maxX = upperRight.x;
-        minY = lowerLeft.y;
-        maxY = upperRight.y;
+        gameState = FindObjectOfType<GameManager>();
         Spawn();
     }
 
@@ -36,29 +32,32 @@ public class EnemySpawn : MonoBehaviour
     void Update()
     {
         timeSinceLastSpawn += Time.deltaTime;
-        if(timeSinceLastSpawn >= spawnIntervel)
+        if(timeSinceLastSpawn >= spawnIntervel && gameState.state != GameState.LOST)
         {
             Spawn();
         }
     }
     public void Spawn()
     {
-        if (player != null)
+        Vector3 lowerLeft = mainCamera.ViewportToWorldPoint(new Vector3(padding, padding, 0f));
+        Vector3 upperRight = mainCamera.ViewportToWorldPoint(new Vector3(1f - padding, 1f - padding, 0f));
+        minX = lowerLeft.x;
+        maxX = upperRight.x;
+        minY = lowerLeft.y;
+        maxY = upperRight.y;
+        Vector2 spawnLocation = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
+        while (Vector2.Distance(spawnLocation, player.transform.position) < minSpawnDistance)
         {
-            Vector2 spawnLocation = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
-            while (Vector2.Distance(spawnLocation, player.transform.position) < minSpawnDistance)
-            {
-                spawnLocation = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
-            }
-
-            Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-
-            // Rotate the enemy towards the player
-            float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg;
-            Quaternion spawnRotation = Quaternion.AngleAxis(angle - 90f, Vector3.forward);
-
-            Instantiate(enemyPrefab, spawnLocation, spawnRotation);
-            timeSinceLastSpawn = 0;
+            spawnLocation = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
         }
+
+        Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+
+        // Rotate the enemy towards the player
+        float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg;
+        Quaternion spawnRotation = Quaternion.AngleAxis(angle - 90f, Vector3.forward);
+
+        Instantiate(enemyPrefab, spawnLocation, spawnRotation);
+        timeSinceLastSpawn = 0;
     }
 }

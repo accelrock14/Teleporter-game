@@ -8,40 +8,52 @@ public class PlayerMovement : MonoBehaviour
     public float rotateSpeed = 180f;
     public float padding = 0f;
 
+    public Transform circle;
+    public Transform outerCircle;
+
+    float horizontalInput;
+    public float recoil = 0.1f;
+
     private Rigidbody2D rb;
     private Camera mainCamera;
-
-    Vector2 movement;
+    private Joystick joystick;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
+        joystick = FindObjectOfType<Joystick>();
     }
-
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-    }
+        // Rotate the player based on the input
+        transform.Rotate(Vector3.forward * -joystick.Horizontal * rotateSpeed * Time.deltaTime);
 
+        // Apply a force in the direction of rotation
+        rb.velocity = transform.up * moveSpeed * Time.deltaTime;
+
+        if (joystick.Horizontal != 0)
+        {
+            rb.AddForce(transform.right * recoil * -Mathf.Sign(joystick.Horizontal), ForceMode2D.Impulse);
+        }
+        //horizontalInput = Input.GetAxis("Horizontal");
+    }
+    /*
     private void FixedUpdate()
     {
-        Vector2 newPosition = (Vector2)transform.position + movement * moveSpeed * Time.deltaTime;
+        horizontalInput = Input.GetAxis("Horizontal");
+        // Rotate the player based on the input
+        transform.Rotate(Vector3.forward * -horizontalInput * rotateSpeed * Time.deltaTime);
 
-        Vector3 lowerLeft = mainCamera.ViewportToWorldPoint(new Vector3(padding, padding, 0f));
-        Vector3 upperRight = mainCamera.ViewportToWorldPoint(new Vector3(1f - padding, 1f - padding, 0f));
-        float newX = Mathf.Clamp(newPosition.x, lowerLeft.x, upperRight.x);
-        float newY = Mathf.Clamp(newPosition.y, lowerLeft.y, upperRight.y);
-        transform.position = new Vector3(newX, newY, transform.position.z);
-
-        if (movement != Vector2.zero)
+        // Apply a force in the direction of rotation
+        rb.velocity = transform.up * moveSpeed * Time.deltaTime;
+        
+        if(horizontalInput != 0)
         {
-            float angle = Mathf.Atan2(movement.y, movement.x) * Mathf.Rad2Deg;
-            Quaternion targetRotation = Quaternion.AngleAxis(angle - 90f, Vector3.forward);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotateSpeed * Time.deltaTime);
-        }
+            rb.AddForce(transform.right * recoil * -Mathf.Sign(horizontalInput), ForceMode2D.Impulse);
+        }   
     }
+    */
 }
