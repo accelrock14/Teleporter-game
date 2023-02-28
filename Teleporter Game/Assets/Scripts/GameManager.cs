@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public enum GameState { START, LOST}
@@ -9,16 +6,24 @@ public enum GameState { START, LOST}
 public class GameManager : MonoBehaviour
 {
     public GameState state;
-    public Button button;
+    public GameObject menu;
 
     // Start is called before the first frame update
     void Start()
     {
         state = GameState.START;
     }
+    public void PlayGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
     public void Restart()
     {
-        button.gameObject.SetActive(true);
+        menu.gameObject.SetActive(true);
     }
     public void RestartScene()
     {

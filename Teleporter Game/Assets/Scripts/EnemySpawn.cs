@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawn : MonoBehaviour
@@ -16,7 +14,7 @@ public class EnemySpawn : MonoBehaviour
     private float spawnIntervel;
     private float minX, maxX, minY, maxY;
     private float padding = 0f;
-    private float minSpawnDistance = 2f;
+    private float minSpawnDistance = 5f;
 
     // Start is called before the first frame update
     void Start()

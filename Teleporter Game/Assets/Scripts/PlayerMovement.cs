@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -11,18 +9,15 @@ public class PlayerMovement : MonoBehaviour
     public Transform circle;
     public Transform outerCircle;
 
-    float horizontalInput;
     public float recoil = 0.1f;
 
     private Rigidbody2D rb;
-    private Camera mainCamera;
     private Joystick joystick;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        mainCamera = Camera.main;
         joystick = FindObjectOfType<Joystick>();
     }
     // Update is called once per frame
@@ -38,7 +33,6 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.AddForce(transform.right * recoil * -Mathf.Sign(joystick.Horizontal), ForceMode2D.Impulse);
         }
-        //horizontalInput = Input.GetAxis("Horizontal");
     }
     /*
     private void FixedUpdate()

@@ -259,12 +259,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 225
-  padding: 0.06
+  padding: -0.5
   rotateSpeed: 125
-  minTeleportInterval: 3
-  maxTeleportInterval: 6
-  minFireInterval: 3
-  maxFireInterval: 6
+  minTeleportInterval: 2
+  maxTeleportInterval: 4
+  minFireInterval: 2
+  maxFireInterval: 5
+  minSpawnDistance: 6
   firePoint: {fileID: 8836423291633777068}
   bulletPrefab: {fileID: 9133774094695103902, guid: 697732224de6ab648bb28733056234c1, type: 3}
 --- !u!58 &8836423291796240843

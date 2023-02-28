@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -19,7 +17,7 @@ public class EnemyController : MonoBehaviour
     private float lastFired = 0f;
     private float teleportInterval;
     private float timeSinceLastSpawn = 0f;
-    private float minSpawnDistance = 2f;
+    private float minSpawnDistance = 5f;
     private float minX, maxX, minY, maxY;
 
     private GameObject player;
