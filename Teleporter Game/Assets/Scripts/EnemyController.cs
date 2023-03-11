@@ -6,20 +6,21 @@ public class EnemyController : MonoBehaviour
     public float moveSpeed = 2f;
     public float padding = 0f;
     public float rotateSpeed = 1000f;
+    /*
     [Header("Teleport variables")]
     public float minTeleportInterval = 2f;
     public float maxTeleportInterval = 4f;
     [Header("Fire variables")]
     public float minFireInterval = 2f;
     public float maxFireInterval = 4f;
-
+    
     private float fireRate;
     private float lastFired = 0f;
     private float teleportInterval;
     private float timeSinceLastSpawn = 0f;
     private float minSpawnDistance = 5f;
     private float minX, maxX, minY, maxY;
-
+    */
     private GameObject player;
     private Rigidbody2D rb;
     private Camera mainCamera;
@@ -36,8 +37,8 @@ public class EnemyController : MonoBehaviour
         mainCamera = Camera.main;
         gameState = FindObjectOfType<GameManager>();
 
-        teleportInterval = Random.Range(minTeleportInterval, maxTeleportInterval);
-        fireRate = Random.Range(minFireInterval, maxFireInterval);
+        //teleportInterval = Random.Range(minTeleportInterval, maxTeleportInterval);
+        //fireRate = Random.Range(minFireInterval, maxFireInterval);
     }
 
     // Update is called once per frame
@@ -46,17 +47,18 @@ public class EnemyController : MonoBehaviour
         // Rotate the enemy towards the player
         if (gameState.state != GameState.LOST)
         {
+            Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+            directionToPlayer.Normalize();
+            rb.velocity = transform.up * moveSpeed * Time.deltaTime;
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Rotate(), rotateSpeed * Time.deltaTime);
+
+            /*
             Vector3 lowerLeft = mainCamera.ViewportToWorldPoint(new Vector3(padding, padding, 0f));
             Vector3 upperRight = mainCamera.ViewportToWorldPoint(new Vector3(1f - padding, 1f - padding, 0f));
             minX = lowerLeft.x;
             maxX = upperRight.x;
             minY = lowerLeft.y;
             maxY = upperRight.y;
-
-            Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-            directionToPlayer.Normalize();
-            rb.velocity = transform.up * moveSpeed * Time.deltaTime;
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Rotate(), rotateSpeed * Time.deltaTime);
 
             timeSinceLastSpawn += Time.deltaTime;
 
@@ -72,6 +74,7 @@ public class EnemyController : MonoBehaviour
             {
                 Shoot();
             }
+            */
         }
     }
     private Quaternion Rotate()
@@ -83,6 +86,7 @@ public class EnemyController : MonoBehaviour
         Quaternion targetRotation = Quaternion.AngleAxis(angle - 90f, Vector3.forward);
         return targetRotation;
     }
+    /*
     private void Teleport()
     {
         Vector2 currentDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
@@ -101,4 +105,5 @@ public class EnemyController : MonoBehaviour
         lastFired = 0f;
         fireRate = Random.Range(minFireInterval, maxFireInterval);
     }
+    */
 }

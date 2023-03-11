@@ -24,9 +24,11 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         menu.gameObject.SetActive(true);
+        AudioManager.bgInstance.bgMusic.Stop();
     }
     public void RestartScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        AudioManager.bgInstance.bgMusic.Play();
     }
 }
